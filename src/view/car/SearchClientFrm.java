@@ -210,7 +210,7 @@ public class SearchClientFrm extends javax.swing.JFrame {
 
         for (int i = 0; i < clients.size(); i++) {
             Client client = clients.get(i);
-            data[i][0] = String.valueOf(client.getId()); // Convert int ID to String
+            data[i][0] = String.valueOf(client.getId()); 
             data[i][1] = client.getName();
             data[i][2] = client.getCccd();
             data[i][3] = client.getAddress();
@@ -222,7 +222,6 @@ public class SearchClientFrm extends javax.swing.JFrame {
         DefaultTableModel tableModel = new DefaultTableModel(data, columnNames) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                // Make all cells non-editable
                 return false;
             }
         };
