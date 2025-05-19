@@ -29,7 +29,7 @@ public class RentingDAO extends DAO {
 
         try {
             conn = new DAO().getConnection();
-            conn.setAutoCommit(false); // Bắt đầu giao dịch
+            conn.setAutoCommit(false); 
 
             // 1. Thêm thông tin thuê xe vào bảng Renting
             psRenting = conn.prepareStatement(sqlAddRenting, Statement.RETURN_GENERATED_KEYS);
@@ -65,7 +65,7 @@ public class RentingDAO extends DAO {
                 rsCheck = psCheckRented.executeQuery();
                 if (rsCheck.next()) {
                     conn.rollback();
-                    return false; // Xe đã được thuê trong thời gian này
+                    return false; 
                 }
 
                 // Nếu không bị trùng lịch thì thêm vào
@@ -79,13 +79,13 @@ public class RentingDAO extends DAO {
                 psRentedCar.executeUpdate();
             }
 
-            conn.commit(); // Hoàn tất giao dịch
+            conn.commit();
             return true;
 
         } catch (SQLException e) {
             e.printStackTrace();
             try {
-                if (conn != null) conn.rollback(); // Hoàn tác nếu có lỗi
+                if (conn != null) conn.rollback(); 
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }

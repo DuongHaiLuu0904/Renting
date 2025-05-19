@@ -17,8 +17,8 @@ public class ContractFrm extends javax.swing.JFrame {
 
     private Client selectedClient;
     private ArrayList<Car> selectedCars;
-    private Date pickupDate; // Using java.util.Date
-    private Date returnDate; // Using java.util.Date
+    private Date pickupDate; 
+    private Date returnDate; 
 
     private RentingDAO rentingDAO;
 
@@ -271,47 +271,31 @@ public class ContractFrm extends javax.swing.JFrame {
 
     private void btnConfirmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfirmActionPerformed
         try {
-            // 1. Validate input
-            System.out.println(loggedInAgent);
-            if (selectedClient == null || selectedCars == null || selectedCars.isEmpty() || pickupDate == null || returnDate == null || loggedInAgent == null) {
-                JOptionPane.showMessageDialog(this,
-                        "Không thể tạo hợp đồng. Thiếu thông tin cần thiết.",
-                        "Lỗi", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            // 2. Get promotion value
             String promotionText = txtPromotion.getText().trim();
             String promotion = "0"; 
             if (!promotionText.isEmpty()) {
                 promotion = promotionText;
             }
 
-            // 3. Calculate total amount and deposit
             double totalRentPrice = 0;
             long diffTime = returnDate.getTime() - pickupDate.getTime();
             int diffDays = (int) (diffTime / (1000 * 60 * 60 * 24)) + 1; 
 
-            // Calculate total rent price
             for (Car car : selectedCars) {
                 totalRentPrice += car.getPrice() * diffDays;
             }
 
-            // Apply promotion discount if any
             double promotionValue = 0;
             try {
                 promotionValue = Double.parseDouble(promotion);
             } catch (NumberFormatException e) {
-                // If promotion is not a valid number, use 0
+                
             }
 
-            // Calculate deposit (30% of total rent)
             float deposit = (float) (totalRentPrice * 0.3);
 
-            // Apply promotion to total amount
             float totalAmount = (float) (totalRentPrice * (1 - promotionValue / 100) + deposit);
 
-            // 4. Create a new Renting object
             Renting renting = new Renting();
             renting.setPromotion(promotion);
             renting.setTotalAmount((float) totalAmount);
@@ -319,12 +303,10 @@ public class ContractFrm extends javax.swing.JFrame {
             renting.setClientID(selectedClient.getId());
             renting.setRentalAgentID(loggedInAgent.getId() + 1);
 
-            // 5. Create RentedCar objects for each selected car
             ArrayList<RentedCar> rentedCars = new ArrayList<>();
             for (Car car : selectedCars) {
                 RentedCar rentedCar = new RentedCar();
 
-                // Convert java.util.Date to java.sql.Date for database compatibility
                 java.sql.Date sqlPickupDate = new java.sql.Date(pickupDate.getTime());
                 java.sql.Date sqlReturnDate = new java.sql.Date(returnDate.getTime());
 
@@ -332,20 +314,16 @@ public class ContractFrm extends javax.swing.JFrame {
                 rentedCar.setCarReturnDate(sqlReturnDate);
                 rentedCar.setCarID(car.getId());
 
-                // Calculate amount for this specific car
                 float carAmount = (float) (car.getPrice() * diffDays);
                 rentedCar.setAmount(carAmount);
 
                 rentedCars.add(rentedCar);
             }
 
-            // 6. Set rentedCars to the renting object
             renting.setRentedCars(rentedCars);
 
-            // 7. Save to database using RentingDAO
             boolean success = rentingDAO.addRenting(renting);
 
-            // 8. Handle result
             if (success) {
                 JOptionPane.showMessageDialog(this,
                         "Hợp đồng đã được tạo thành công!",
@@ -374,11 +352,10 @@ public class ContractFrm extends javax.swing.JFrame {
         calculateAndDisplayRentPrice();
     }//GEN-LAST:event_txtPromotionKeyReleased
 
-    // Phương thức hiển thị thông tin khách hàng
     private void displayClientInfo() {
         if (selectedClient != null) {
             DefaultTableModel model = (DefaultTableModel) tblClient.getModel();
-            // Xóa tất cả các hàng hiện có
+
             model.setRowCount(0);
 
             Object[] row = {
@@ -394,17 +371,14 @@ public class ContractFrm extends javax.swing.JFrame {
         }
     }
 
-    // Phương thức hiển thị thông tin các xe được chọn
     private void displayCarsInfo() {
         if (selectedCars != null && !selectedCars.isEmpty()) {
             displayCarList(selectedCars);
 
-            // Tính và hiển thị giá thuê
             calculateAndDisplayRentPrice();
         }
     }
 
-    // Phương thức hiển thị danh sách xe
     private void displayCarList(ArrayList<Car> cars) {
         String[] columnNames = {"ID", "Name", "Type", "Price", "Car Line", "Fuel Condition", "Type Condition", "Interior Condition", "Damages"};
         String[][] data = new String[cars.size()][columnNames.length];
@@ -429,14 +403,12 @@ public class ContractFrm extends javax.swing.JFrame {
             }
         };
 
-        // Set the model to the table
         tblListCar.setModel(tableModel);
     }
 
-    // Hiển thị thông tin ngày nhận và trả xe
     private void displayDates() {
         if (pickupDate != null) {
-            // Định dạng ngày thành chuỗi dễ đọc
+
             java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("dd/MM/yyyy");
             lblCarPickUpDate.setText(dateFormat.format(pickupDate));
         } else {
@@ -451,20 +423,17 @@ public class ContractFrm extends javax.swing.JFrame {
         }
     }
 
-    // Tính và hiển thị giá thuê, tiền đặt cọc và tổng tiền
     private void calculateAndDisplayRentPrice() {
         if (selectedCars != null && !selectedCars.isEmpty() && pickupDate != null && returnDate != null) {
-            // Tính số ngày thuê
-            long diffTime = returnDate.getTime() - pickupDate.getTime();
-            int diffDays = (int) (diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 để tính cả ngày đầu và cuối
 
-            // Tính tổng giá thuê
+            long diffTime = returnDate.getTime() - pickupDate.getTime();
+            int diffDays = (int) (diffTime / (1000 * 60 * 60 * 24)) + 1; 
+
             double totalRentPrice = 0;
             for (Car car : selectedCars) {
                 totalRentPrice += car.getPrice() * diffDays;
             }
 
-            // Lấy giá trị khuyến mãi (nếu có)
             double promotion = 0;
             try {
                 String promoText = txtPromotion.getText().trim();
@@ -475,13 +444,10 @@ public class ContractFrm extends javax.swing.JFrame {
 
             }
 
-            // Tính tiền đặt cọc (ví dụ: 30% tổng tiền)
             float deposit = (float) (totalRentPrice * 0.3);
 
-            // Áp dụng khuyến mãi
             float discountedPrice = (float) (totalRentPrice * (1 - promotion / 100) + deposit);
 
-            // Hiển thị thông tin
             lblRentPrice.setText(String.format("%.2f", totalRentPrice) + "Đ");
             lblDeposit.setText(String.format("%.2f", deposit) + "Đ");
             lblTotalAmount.setText(String.format("%.2f", discountedPrice) + "Đ");
@@ -500,7 +466,7 @@ public class ContractFrm extends javax.swing.JFrame {
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(ContractFrm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
+
         java.awt.EventQueue.invokeLater(() -> {
             new ContractFrm().setVisible(true);
         });
