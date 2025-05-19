@@ -51,7 +51,7 @@ public class ClientDAO extends DAO {
 
     @SuppressWarnings("CallToPrintStackTrace")
     public void addClient(Client client) {
-        String sql = "INSERT INTO Client(name, cccd, Address, phoneNumber, Email, Note) VALUES(?,?,?,?,?,?)";
+        String sql = "INSERT INTO Client(name, CCCD, Address, phoneNumber, Email, Note) VALUES(?,?,?,?,?,?)";
 
         try (PreparedStatement ps = new DAO().getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 

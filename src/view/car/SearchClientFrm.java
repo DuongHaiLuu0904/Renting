@@ -110,6 +110,11 @@ public class SearchClientFrm extends javax.swing.JFrame {
         txtCCCD.setText("Nhập CCCD");
 
         btnAdd.setText("Add Client");
+        btnAdd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -214,6 +219,11 @@ public class SearchClientFrm extends javax.swing.JFrame {
             selectedClient = null;
         }
     }//GEN-LAST:event_tblListClientMouseClicked
+
+    private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
+        new AddClientFrm(loggedInAgent).setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_btnAddActionPerformed
 
     private void displayClientList(ArrayList<Client> clients) {
         String[] columnNames = {"ID", "Name", "CCCD", "Address", "PhoneNumber", "Email", "Note"};

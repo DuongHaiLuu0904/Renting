@@ -14,12 +14,11 @@ import view.agent.ContractFrm;
 
 public class SearchCarFrm extends javax.swing.JFrame {
 
-    // Add CarDAO instance
     private CarDAO carDAO;
-    // Add list to hold search results
+
     private ArrayList<Car> listCar;
-    // Add a field to store the selected client
-    private Client selectedClient; // To store the client passed from SearchClientFrm
+
+    private Client selectedClient; 
 
     private ArrayList<Car> selectedCars;
     

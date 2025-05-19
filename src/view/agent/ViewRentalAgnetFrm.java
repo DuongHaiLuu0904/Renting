@@ -99,6 +99,7 @@ public class ViewRentalAgnetFrm extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
+        new LoginFrm().setVisible(true);
         this.dispose();
     }//GEN-LAST:event_btnCancelActionPerformed
 

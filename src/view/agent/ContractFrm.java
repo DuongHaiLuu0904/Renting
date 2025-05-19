@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+
 import model.Car;
 import model.Client;
 import model.RentalAgent;
