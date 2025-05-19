@@ -9,6 +9,7 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import model.Car;
 import model.Client;
+import model.RentalAgent;
 import view.agent.ContractFrm;
 
 public class SearchCarFrm extends javax.swing.JFrame {
@@ -21,6 +22,8 @@ public class SearchCarFrm extends javax.swing.JFrame {
     private Client selectedClient; // To store the client passed from SearchClientFrm
 
     private ArrayList<Car> selectedCars;
+    
+    private RentalAgent loggedInAgent;
 
     public SearchCarFrm() {
         initComponents();
@@ -29,10 +32,13 @@ public class SearchCarFrm extends javax.swing.JFrame {
         selectedCars = new ArrayList<>();
         displayCarList(listCar);
         this.selectedClient = null;
+        this.loggedInAgent = null;
     }
 
-    public SearchCarFrm(Client selectedClient) {
+    public SearchCarFrm(Client selectedClient, RentalAgent loggedInAgent) {
         this.selectedClient = selectedClient;
+        this.loggedInAgent = loggedInAgent;
+        
         initComponents();
 
         carDAO = new CarDAO();
@@ -191,7 +197,7 @@ public class SearchCarFrm extends javax.swing.JFrame {
 
     private void displayCarList(ArrayList<Car> cars) {
         
-        String[] columnNames = {"ID", "Tên", "Kiểu xe", "Giá Thuê", "Dòng xe", "Đã chọn"}; // Added "Đã chọn" column
+        String[] columnNames = {"ID", "Tên", "Kiểu xe", "Giá Thuê", "Dòng xe", "Đã chọn"}; 
 
         String[][] data = new String[cars.size()][columnNames.length];
 
@@ -318,7 +324,8 @@ public class SearchCarFrm extends javax.swing.JFrame {
                     selectedClient,
                     selectedCars,
                     new java.sql.Date(pickupDate.getTime()),
-                    new java.sql.Date(returnDate.getTime())
+                    new java.sql.Date(returnDate.getTime()),
+                    loggedInAgent
             );
             contractFrm.setVisible(true);
             this.dispose(); // Close the current form

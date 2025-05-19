@@ -17,7 +17,7 @@ public class RentalAgentDAO extends DAO {
         boolean result = false;
         String sql = "SELECT name, position FROM RentalAgent WHERE username = ? AND password = ?";
         try {
-            PreparedStatement ps = con.prepareStatement(sql);
+            PreparedStatement ps = new DAO().getConnection().prepareStatement(sql);
             ps.setString(1, agent.getUsername());
             ps.setString(2, agent.getPassword());
             ResultSet rs = ps.executeQuery();

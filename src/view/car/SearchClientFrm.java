@@ -6,6 +6,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.JOptionPane;
 
 import model.Client;
+import model.RentalAgent;
 
 public class SearchClientFrm extends javax.swing.JFrame {
 
@@ -14,11 +15,22 @@ public class SearchClientFrm extends javax.swing.JFrame {
     private ArrayList<Client> listClient;
 
     private Client selectedClient;
-
+    
+    private RentalAgent loggedInAgent;
+    
     public SearchClientFrm() {
         initComponents();
         clientDAO = new ClientDAO();
         listClient = new ArrayList<>();
+        this.loggedInAgent = null;
+        displayClientList(listClient);
+    }
+
+    public SearchClientFrm(RentalAgent loggedInAgent) {
+        initComponents();
+        clientDAO = new ClientDAO();
+        listClient = new ArrayList<>();
+        this.loggedInAgent = loggedInAgent;
         displayClientList(listClient);
     }
 
@@ -177,7 +189,7 @@ public class SearchClientFrm extends javax.swing.JFrame {
             System.out.println("Proceeding with selected Client: " + selectedClient.toString());
 
             try {
-                SearchCarFrm searchCarFrm = new SearchCarFrm(selectedClient);
+                SearchCarFrm searchCarFrm = new SearchCarFrm(selectedClient, loggedInAgent);
                 searchCarFrm.setVisible(true);
                 this.dispose();
             } catch (Exception e) {

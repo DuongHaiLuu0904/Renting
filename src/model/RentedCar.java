@@ -1,27 +1,27 @@
 package model;
 
 import java.io.Serializable;
-import java.sql.Date; // Using java.sql.Date for database date types
+import java.sql.Date;
 
 public class RentedCar implements Serializable {
     private int id;
     private Date carPickupDate;
     private Date carReturnDate;
     private float amount;
-    private int carlD; // Corresponds to Car ID, keeping the original name
-    private int rentingID;
+    private int carId;       // Sửa lại tên biến cho đúng chuẩn
+    private int rentingId;
 
     public RentedCar() {
         super();
     }
 
-    public RentedCar(Date carPickupDate, Date carReturnDate, float amount, int carlD, int rentingID) {
+    public RentedCar(Date carPickupDate, Date carReturnDate, float amount, int carId, int rentingId) {
         super();
         this.carPickupDate = carPickupDate;
         this.carReturnDate = carReturnDate;
         this.amount = amount;
-        this.carlD = carlD;
-        this.rentingID = rentingID;
+        this.carId = carId;
+        this.rentingId = rentingId;
     }
 
     public int getId() {
@@ -56,20 +56,20 @@ public class RentedCar implements Serializable {
         this.amount = amount;
     }
 
-    public int getCarlD() {
-        return carlD;
+    public int getCarID() {
+        return carId;
     }
 
-    public void setCarlD(int carlD) {
-        this.carlD = carlD;
+    public void setCarID(int carId) {
+        this.carId = carId;
     }
 
-    public int getRentingID() {
-        return rentingID;
+    public int getRentingId() {
+        return rentingId;
     }
 
-    public void setRentingID(int rentingID) {
-        this.rentingID = rentingID;
+    public void setRentingId(int rentingId) {
+        this.rentingId = rentingId;
     }
 
     @Override
@@ -79,8 +79,8 @@ public class RentedCar implements Serializable {
                ", carPickupDate=" + carPickupDate +
                ", carReturnDate=" + carReturnDate +
                ", amount=" + amount +
-               ", carlD=" + carlD +
-               ", rentingID=" + rentingID +
+               ", carId=" + carId +
+               ", rentingId=" + rentingId +
                '}';
     }
 }

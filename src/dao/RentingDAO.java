@@ -5,12 +5,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList; // Assuming Renting object might contain a list
 import model.RentedCar;
 import model.Renting;
-// Assuming Renting object contains a list of RentedCar objects,
-// and RentedCar object contains a Car object or just the car ID.
-// Also assuming Renting object contains Client and RentalAgent objects or their IDs.
+
 
 public class RentingDAO extends DAO {
 
@@ -20,133 +17,91 @@ public class RentingDAO extends DAO {
 
     @SuppressWarnings("CallToPrintStackTrace")
     public boolean addRenting(Renting renting) {
-        // SQL to insert into the Renting table
-        String sqlAddRenting = "INSERT INTO Renting(promotion, totalAmount, collateral, saleoff, clientID, rentalAgnetID) VALUES(?,?,?,?,?,?)";
-        // SQL to insert into the RentedCar table
-        String sqlAddRentedCar = "INSERT INTO RentedCar(carPickupDate, carReturnDate, Amount, CarlD, RentingID) VALUES(?,?,?,?,?)";
-        // SQL to check if a car is already rented during a specific period
-        String sqlCheckRentedCar = "SELECT ID FROM RentedCar WHERE CarlD = ? AND carReturnDate > ? AND carPickupDate < ?";
+        String sqlAddRenting = "INSERT INTO Renting(promotion, totalAmount, deposit, ClientID, RentalAgnetID) VALUES (?, ?, ?, ?, ?)";
+        String sqlAddRentedCar = "INSERT INTO RentedCar(carPickupDate, carReturnDate, Amount, CarID, RentingID) VALUES (?, ?, ?, ?, ?)";
+        String sqlCheckRentedCar = "SELECT ID FROM RentedCar WHERE CarID = ? AND carReturnDate > ? AND carPickupDate < ?";
 
-        boolean result = true;
-        Connection connection = null; // Declare connection outside try-with-resources for rollback/commit
+        Connection conn = null;
+        PreparedStatement psRenting = null;
+        PreparedStatement psRentedCar = null;
+        PreparedStatement psCheckRented = null;
+        ResultSet rsCheck = null;
 
         try {
-            connection = DAO.con; // Get the connection
-            connection.setAutoCommit(false); // Start transaction
+            conn = new DAO().getConnection();
+            conn.setAutoCommit(false); // Bắt đầu giao dịch
 
-            // 1. Insert into Renting table
-            try (PreparedStatement psRenting = connection.prepareStatement(sqlAddRenting, Statement.RETURN_GENERATED_KEYS)) {
-                psRenting.setString(1, renting.getPromotion());
-                psRenting.setFloat(2, renting.getTotalAmount());
-                psRenting.setFloat(3, renting.getCollateral());
-                psRenting.setInt(4, renting.getSaleoff());
-                psRenting.setInt(5, renting.getClient().getId()); // Get Client ID
-                psRenting.setInt(6, renting.getRentalAgent().getId()); // Get RentalAgent ID
-                int affectedRows = psRenting.executeUpdate();
+            // 1. Thêm thông tin thuê xe vào bảng Renting
+            psRenting = conn.prepareStatement(sqlAddRenting, Statement.RETURN_GENERATED_KEYS);
+            psRenting.setString(1, renting.getPromotion());
+            psRenting.setFloat(2, renting.getTotalAmount());
+            psRenting.setFloat(3, renting.getDeposit());
+            psRenting.setInt(4, renting.getClientID());
+            psRenting.setInt(5, renting.getRentalAgentID());
 
-                if (affectedRows == 0) {
-                    throw new SQLException("Creating renting failed, no rows affected.");
-                }
-
-                // Get generated ID for Renting
-                try (ResultSet generatedKeys = psRenting.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        renting.setId(generatedKeys.getInt(1));
-                    } else {
-                        throw new SQLException("Creating renting failed, no ID obtained.");
-                    }
-                }
+            int affectedRows = psRenting.executeUpdate();
+            if (affectedRows == 0) {
+                conn.rollback();
+                return false;
             }
 
-            // Assuming Renting object has a method getRentedCars() that returns a list of RentedCar
-            ArrayList<RentedCar> rentedCars = renting.getRentedCars();
-
-            if (rentedCars != null) {
-                // 2. Insert Rented Cars and check availability
-                for (RentedCar rentedCar : rentedCars) {
-                    // Check if the car is available during the period
-                    try (PreparedStatement psCheck = connection.prepareStatement(sqlCheckRentedCar)) {
-                        psCheck.setInt(1, rentedCar.getCarlD()); // Assuming RentedCar has CarlD
-                        psCheck.setDate(2, rentedCar.getCarPickupDate()); // Using java.sql.Date
-                        psCheck.setDate(3, rentedCar.getCarReturnDate()); // Using java.sql.Date
-
-                        try (ResultSet rsCheck = psCheck.executeQuery()) {
-                            if (rsCheck.next()) {
-                                // Car is unavailable
-                                result = false;
-                                System.err.println("Xe ID " + rentedCar.getCarlD() + " không khả dụng trong khoảng thời gian này.");
-                                connection.rollback(); // Rollback the transaction
-                                return result; // Exit the method
-                            }
-                        }
-                    }
-
-                    // Insert RentedCar
-                    try (PreparedStatement psRentedCar = connection.prepareStatement(sqlAddRentedCar, Statement.RETURN_GENERATED_KEYS)) {
-                        psRentedCar.setDate(1, rentedCar.getCarPickupDate()); // Using java.sql.Date
-                        psRentedCar.setDate(2, rentedCar.getCarReturnDate()); // Using java.sql.Date
-                        psRentedCar.setFloat(3, rentedCar.getAmount()); // Assuming Amount in RentedCar
-                        psRentedCar.setInt(4, rentedCar.getCarlD()); // Assuming CarlD in RentedCar
-                        psRentedCar.setInt(5, renting.getId()); // Link RentedCar to the new Renting ID
-
-                        int affectedRows = psRentedCar.executeUpdate();
-
-                        if (affectedRows == 0) {
-                            throw new SQLException("Creating rented car failed, no rows affected.");
-                        }
-
-                        // Get generated ID for RentedCar (if needed)
-                        try (ResultSet generatedKeys = psRentedCar.getGeneratedKeys()) {
-                            if (generatedKeys.next()) {
-                                rentedCar.setId(generatedKeys.getInt(1));
-                            } else {
-                                // Not strictly necessary to fail if RentedCar ID isn't obtained,
-                                // but good practice if you rely on it later.
-                                System.err.println("Warning: Could not retrieve generated ID for a rented car.");
-                            }
-                        }
-                    }
-                }
+            // 2. Lấy ID Renting vừa thêm
+            ResultSet generatedKeys = psRenting.getGeneratedKeys();
+            int rentingID;
+            if (generatedKeys.next()) {
+                rentingID = generatedKeys.getInt(1);
+            } else {
+                conn.rollback();
+                return false;
             }
 
-            connection.commit(); // Commit the transaction if all inserts and checks were successful
+            // 3. Thêm từng xe đã thuê vào bảng RentedCar
+            for (RentedCar rentedCar : renting.getRentedCars()) {
+                // Kiểm tra xem xe đã được thuê trong khoảng thời gian đó chưa
+                psCheckRented = conn.prepareStatement(sqlCheckRentedCar);
+                psCheckRented.setInt(1, rentedCar.getCarID());
+                psCheckRented.setDate(2, rentedCar.getCarPickupDate());
+                psCheckRented.setDate(3, rentedCar.getCarReturnDate());
+                rsCheck = psCheckRented.executeQuery();
+                if (rsCheck.next()) {
+                    conn.rollback();
+                    return false; // Xe đã được thuê trong thời gian này
+                }
+
+                // Nếu không bị trùng lịch thì thêm vào
+                psRentedCar = conn.prepareStatement(sqlAddRentedCar);
+                psRentedCar.setDate(1, rentedCar.getCarPickupDate());
+                psRentedCar.setDate(2, rentedCar.getCarReturnDate());
+                psRentedCar.setFloat(3, rentedCar.getAmount());
+                psRentedCar.setInt(4, rentedCar.getCarID());
+                psRentedCar.setInt(5, rentingID);
+
+                psRentedCar.executeUpdate();
+            }
+
+            conn.commit(); // Hoàn tất giao dịch
+            return true;
 
         } catch (SQLException e) {
-            result = false;
-            System.err.println("Lỗi SQL khi thêm hợp đồng thuê:");
             e.printStackTrace();
-            if (connection != null) {
-                try {
-                    System.err.println("Transaction is being rolled back.");
-                    connection.rollback(); // Rollback on SQL error
-                } catch (SQLException ex) {
-                    System.err.println("Lỗi khi rollback transaction:");
-                    ex.printStackTrace();
-                }
+            try {
+                if (conn != null) conn.rollback(); // Hoàn tác nếu có lỗi
+            } catch (SQLException ex) {
+                ex.printStackTrace();
             }
-        } catch (Exception e) {
-            result = false;
-            System.err.println("Lỗi không mong muốn khi thêm hợp đồng thuê:");
-            e.printStackTrace();
-            if (connection != null) {
-                try {
-                    System.err.println("Transaction is being rolled back due to unexpected error.");
-                    connection.rollback(); // Rollback on other errors
-                } catch (SQLException ex) {
-                    System.err.println("Lỗi khi rollback transaction:");
-                    ex.printStackTrace();
-                }
-            }
+            return false;
         } finally {
-            if (connection != null) {
-                try {
-                    connection.setAutoCommit(true); // Restore auto-commit mode
-                } catch (SQLException ex) {
-                    System.err.println("Lỗi khi khôi phục auto-commit:");
-                    ex.printStackTrace();
-                }
+            try {
+                if (rsCheck != null) rsCheck.close();
+                if (psCheckRented != null) psCheckRented.close();
+                if (psRentedCar != null) psRentedCar.close();
+                if (psRenting != null) psRenting.close();
+                if (conn != null) conn.setAutoCommit(true);
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
         }
-        return result;
     }
+
 }

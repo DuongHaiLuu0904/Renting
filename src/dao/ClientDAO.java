@@ -18,7 +18,7 @@ public class ClientDAO extends DAO {
         ArrayList<Client> result = new ArrayList<>();
         String sql = "SELECT * FROM Client WHERE name LIKE ? OR CCCD LIKE ? ";
 
-        try (PreparedStatement ps = DAO.con.prepareStatement(sql)) {
+        try (PreparedStatement ps = new DAO().getConnection().prepareStatement(sql)) {
 
             String searchKey = "%" + key + "%";
             ps.setString(1, searchKey);
@@ -53,7 +53,7 @@ public class ClientDAO extends DAO {
     public void addClient(Client client) {
         String sql = "INSERT INTO Client(name, cccd, Address, phoneNumber, Email, Note) VALUES(?,?,?,?,?,?)";
 
-        try (PreparedStatement ps = DAO.con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement ps = new DAO().getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setString(1, client.getName());
             ps.setString(2, client.getCccd());
