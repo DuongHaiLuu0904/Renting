@@ -2,6 +2,7 @@ package view.agent;
 
 import dao.RentingDAO;
 import java.awt.HeadlessException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import javax.swing.JOptionPane;
@@ -208,8 +209,8 @@ public class ContractFrm extends javax.swing.JFrame {
                                         .addComponent(jLabel6)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(lblCarPickUpDate, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(49, 49, 49)
-                                        .addComponent(jLabel8)
+                                        .addGap(40, 40, 40)
+                                        .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(lblCarReturnDate, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addGap(74, 74, 74)
@@ -224,8 +225,8 @@ public class ContractFrm extends javax.swing.JFrame {
                                         .addComponent(btnConfirm)
                                         .addGap(154, 154, 154)
                                         .addComponent(btnCancel))))
-                            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 823, Short.MAX_VALUE)
-                            .addComponent(jScrollPane2)))
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 823, Short.MAX_VALUE)
+                            .addComponent(jScrollPane3)))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(361, 361, 361)
                         .addComponent(jLabel1)))
@@ -320,25 +321,19 @@ public class ContractFrm extends javax.swing.JFrame {
                 rentedCars.add(rentedCar);
             }
 
-            renting.setRentedCars(rentedCars);
+            renting.setRentedCars(rentedCars);   
 
             boolean success = rentingDAO.addRenting(renting);
 
             if (success) {
-                JOptionPane.showMessageDialog(this,
-                        "Hợp đồng đã được tạo thành công!",
-                        "Thành công", JOptionPane.INFORMATION_MESSAGE);
-                this.dispose(); // Close the form after successful save
+                JOptionPane.showMessageDialog(this, "Hợp đồng đã được tạo thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                this.dispose(); 
             } else {
-                JOptionPane.showMessageDialog(this,
-                        "Không thể tạo hợp đồng. Có thể xe đã được thuê trong khoảng thời gian này.",
-                        "Lỗi", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Không thể tạo hợp đồng", "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
 
         } catch (HeadlessException e) {
-            JOptionPane.showMessageDialog(this,
-                    "Đã xảy ra lỗi khi tạo hợp đồng: " + e.getMessage(),
-                    "Lỗi", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Đã xảy ra lỗi khi tạo hợp đồng: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
         
     }//GEN-LAST:event_btnConfirmActionPerformed
@@ -349,7 +344,7 @@ public class ContractFrm extends javax.swing.JFrame {
     }//GEN-LAST:event_btnCancelActionPerformed
 
     private void txtPromotionKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPromotionKeyReleased
-        calculateAndDisplayRentPrice();
+        DisplayRentPrice();
     }//GEN-LAST:event_txtPromotionKeyReleased
 
     private void displayClientInfo() {
@@ -375,12 +370,12 @@ public class ContractFrm extends javax.swing.JFrame {
         if (selectedCars != null && !selectedCars.isEmpty()) {
             displayCarList(selectedCars);
 
-            calculateAndDisplayRentPrice();
+            DisplayRentPrice();
         }
     }
 
     private void displayCarList(ArrayList<Car> cars) {
-        String[] columnNames = {"ID", "Name", "Type", "Price", "Car Line", "Fuel Condition", "Type Condition", "Interior Condition", "Damages"};
+        String[] columnNames = {"ID", "Name", "Type", "Price", "Car Line", "Fuel Condition", "Type Condition", "Interior Condition"};
         String[][] data = new String[cars.size()][columnNames.length];
 
         for (int i = 0; i < cars.size(); i++) {
@@ -393,7 +388,6 @@ public class ContractFrm extends javax.swing.JFrame {
             data[i][5] = car.getFuelCondition();
             data[i][6] = car.getTypeCondition();
             data[i][7] = car.getInteriorCondition();
-            data[i][8] = car.getDamages();
         }
 
         DefaultTableModel tableModel = new DefaultTableModel(data, columnNames) {
@@ -408,22 +402,21 @@ public class ContractFrm extends javax.swing.JFrame {
 
     private void displayDates() {
         if (pickupDate != null) {
-
-            java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("dd/MM/yyyy");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
             lblCarPickUpDate.setText(dateFormat.format(pickupDate));
         } else {
             lblCarPickUpDate.setText("");
         }
 
         if (returnDate != null) {
-            java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("dd/MM/yyyy");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
             lblCarReturnDate.setText(dateFormat.format(returnDate));
         } else {
             lblCarReturnDate.setText("");
         }
     }
 
-    private void calculateAndDisplayRentPrice() {
+    private void DisplayRentPrice() {
         if (selectedCars != null && !selectedCars.isEmpty() && pickupDate != null && returnDate != null) {
 
             long diffTime = returnDate.getTime() - pickupDate.getTime();

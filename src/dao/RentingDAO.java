@@ -31,7 +31,7 @@ public class RentingDAO extends DAO {
             conn = new DAO().getConnection();
             conn.setAutoCommit(false); 
 
-            // 1. Thêm thông tin thuê xe vào bảng Renting
+            // Thêm thông tin thuê xe vào bảng Renting
             psRenting = conn.prepareStatement(sqlAddRenting, Statement.RETURN_GENERATED_KEYS);
             psRenting.setString(1, renting.getPromotion());
             psRenting.setFloat(2, renting.getTotalAmount());
@@ -45,7 +45,7 @@ public class RentingDAO extends DAO {
                 return false;
             }
 
-            // 2. Lấy ID Renting vừa thêm
+            // Lấy ID Renting vừa thêm
             ResultSet generatedKeys = psRenting.getGeneratedKeys();
             int rentingID;
             if (generatedKeys.next()) {
@@ -55,7 +55,7 @@ public class RentingDAO extends DAO {
                 return false;
             }
 
-            // 3. Thêm từng xe đã thuê vào bảng RentedCar
+            // Thêm từng xe đã thuê vào bảng RentedCar
             for (RentedCar rentedCar : renting.getRentedCars()) {
                 // Kiểm tra xem xe đã được thuê trong khoảng thời gian đó chưa
                 psCheckRented = conn.prepareStatement(sqlCheckRentedCar);
@@ -90,18 +90,7 @@ public class RentingDAO extends DAO {
                 ex.printStackTrace();
             }
             return false;
-        } finally {
-            try {
-                if (rsCheck != null) rsCheck.close();
-                if (psCheckRented != null) psCheckRented.close();
-                if (psRentedCar != null) psRentedCar.close();
-                if (psRenting != null) psRenting.close();
-                if (conn != null) conn.setAutoCommit(true);
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
+        } 
     }
 
 }

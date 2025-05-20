@@ -41,20 +41,12 @@ public class SearchCarFrm extends javax.swing.JFrame {
         initComponents();
 
         carDAO = new CarDAO();
-
-        listCar = new ArrayList<>();
-
-        selectedCars = new ArrayList<>();
+        listCar = new ArrayList<Car>();
+        selectedCars = new ArrayList<Car>();
 
         displayCarList(listCar);
-
-        if (this.selectedClient != null) {
-            System.out.println("SearchCarFrm opened for Client: " + this.selectedClient.getName());
-            // You could set a label text here, e.g.:
-            lblClientInfo.setText("Khách hàng: " + this.selectedClient.getName());
-        } else {
-            System.out.println("SearchCarFrm opened without a selected client.");
-        }
+        
+        lblClientInfo.setText("Khách hàng: " + this.selectedClient.getName());
     }
 
     @SuppressWarnings("unchecked")
@@ -261,7 +253,7 @@ public class SearchCarFrm extends javax.swing.JFrame {
             }
 
         } catch (ParseException e) {
-            JOptionPane.showMessageDialog(this, "Định dạng ngày tháng không hợp lệ. Vui lòng sử dụng định dạng yyyy-MM-dd.", "Lỗi định dạng", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, " Vui lòng sử dụng định dạng yyyy-MM-dd.", "Lỗi định dạng", JOptionPane.WARNING_MESSAGE);
             listCar.clear();
             displayCarList(listCar);
             return;
@@ -336,7 +328,8 @@ public class SearchCarFrm extends javax.swing.JFrame {
     }//GEN-LAST:event_btnNextActionPerformed
 
     private void bthSearchCarPartnerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bthSearchCarPartnerActionPerformed
-        // TODO add your handling code here:
+        new SearchCarParnterFrm(selectedClient, loggedInAgent).setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_bthSearchCarPartnerActionPerformed
 
     private void tblListCarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblListCarMouseClicked

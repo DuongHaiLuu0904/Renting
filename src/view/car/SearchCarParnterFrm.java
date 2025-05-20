@@ -42,7 +42,7 @@ public class SearchCarParnterFrm extends javax.swing.JFrame {
 
         carDAO = new CarDAO();
 
-        listCar = new ArrayList<>();
+        listCar = new ArrayList<Car>();
 
         selectedCars = new ArrayList<>();
 

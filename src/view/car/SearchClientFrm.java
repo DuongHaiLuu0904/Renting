@@ -28,9 +28,11 @@ public class SearchClientFrm extends javax.swing.JFrame {
 
     public SearchClientFrm(RentalAgent loggedInAgent) {
         initComponents();
+        
         clientDAO = new ClientDAO();
         listClient = new ArrayList<>();
         this.loggedInAgent = loggedInAgent;
+        
         displayClientList(listClient);
     }
 
@@ -248,7 +250,6 @@ public class SearchClientFrm extends javax.swing.JFrame {
             }
         };
 
-        // Set the model to the table
         tblListClient.setModel(tableModel);
     }
 
